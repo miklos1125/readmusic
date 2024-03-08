@@ -1,2 +1,3 @@
 # readmusic
-A tiny destop application to learn and practice sheet music reading.
+A tiny desktop application to learn and practice reading a sheet music.
+This program is under construction: more musical scales, midi-keyboard attachment and more options are to come.
