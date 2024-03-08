@@ -79,15 +79,17 @@ public class MyPanel extends JPanel{
     }
     
     private void setSettings(){
-        scales = new JComboBox(new String[]{"Chromatic scale",
+        String[] s1 = {"Chromatic scale",
             "No sign. (C Major / A Minor)", "1#  (G Major / E Minor)",
             "2#  (D Major / B Minor)", "3#  (A Major/F-sharp Minor)",
-            "4#  (E Major/C-sharp Minor)", "5#  (B Major/G-sharp Minor)"});
+            "4#  (E Major/C-sharp Minor)", "5#  (B Major/G-sharp Minor)"};
+        scales = new JComboBox(s1);
         scales.setFont(new Font("Serif", Font.PLAIN, 12));
         scales.setBounds(20,40,150,30);
         this.add(scales);
         
-        parts = new JComboBox(new String[]{"Grand Staff", "Treble", "Bass"});
+        String[] s2 = {"Grand Staff", "Treble", "Bass"};
+        parts = new JComboBox(s2);
         parts.setBounds(180,40,90,30);
         this.add(parts);
     }
