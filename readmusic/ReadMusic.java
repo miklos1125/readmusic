@@ -1,6 +1,7 @@
 package readmusic;
 
 import java.awt.*;
+import java.net.URL;
 import javax.swing.*;
 import static readmusic.ReadMusic.*;
 
@@ -13,7 +14,7 @@ public class ReadMusic{
     static GameEngine engine;
     
     public static void main(String[] args) {
-        frame = new JFrame();
+        frame = new JFrame("Read Music Sheets");
         frame.setBounds(100, 100, 1000, 550);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -23,13 +24,16 @@ public class ReadMusic{
         frame.setVisible(true);
         sounds = new Sounds();
         engine = new GameEngine();
+        //URL u = frame.getClass().getResource("pic/pianoicon.png");
+        Image icon = Toolkit.getDefaultToolkit().getImage("pic/trebleclef.png");
+        frame.setIconImage(icon);
     }     
 }
 
 class GameEngine{
     int pitch;
     boolean isTreble;
-    int counter, rightChoice;
+    private int counter, rightChoice;
     int[] standardRow = {1,3,5,6,8,10,12,13,15,17,18,20,22,24,25,27,
                     29,30,32,34,36,37,39,41,42,44,46,48,49};
                    
@@ -92,18 +96,33 @@ class GameEngine{
     /*String name argument isn't used yet*/
     void checkSolution(int keyNumber, String name){
         if (keyNumber == pitch){
-            panel.labelA.setForeground(Color.GREEN);
-            panel.labelA.setText("");
-            panel.labelB.setForeground(Color.GREEN);
-            panel.labelB.setText(++counter + "/" + ++rightChoice);
+            panel.labelC.setForeground(Color.WHITE);
+            panel.labelC.setText("Hit the corresponding key!");
+            panel.labelB.setForeground(Color.WHITE);
+            panel.labelB.setText(++counter + " / " + ++rightChoice);
             selectPitch();
         } else{
-            panel.labelA.setForeground(Color.RED);
-            panel.labelA.setText("Try again!");
+            panel.labelC.setForeground(Color.RED);
+            panel.labelC.setText("Try again!");
             panel.labelB.setForeground(Color.RED);
-            panel.labelB.setText(++counter + "/" + rightChoice);
+            panel.labelB.setText(++counter + " / " + rightChoice);
         }
-    }    
+    }
+    
+    public int getCounterNum(){
+        return counter;
+    }
+            
+    public int getRightChoices(){
+        return rightChoice;
+    }
+    
+    void reset(){
+        counter =0;
+        rightChoice = 0;
+    }
+    
+    
 }
 
 

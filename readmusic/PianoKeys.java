@@ -12,6 +12,7 @@ public class PianoKeys extends JButton implements MouseListener{
     private int place;
     private int mainNumber;
     boolean quiz = false;
+    private boolean playsSound;
     
     void setPlace(int x){
         place = x;
@@ -31,6 +32,10 @@ public class PianoKeys extends JButton implements MouseListener{
         }else{
             setText("");
         }
+    }
+    
+    void turnSoundOnOff(){
+        playsSound = !(playsSound);
     }
     
     PianoKeys(String note, int octave, int num){
@@ -72,15 +77,14 @@ public class PianoKeys extends JButton implements MouseListener{
         //System.out.println(mainNumber+"("+note+"-"+octave+")");
         
         if(e.getButton() ==1 && this.isEnabled()) {
-            sounds.playSound(mainNumber);
-            if (quiz)
-            engine.checkSolution(mainNumber, note+"-"+octave);
+            if (playsSound) sounds.playSound(mainNumber);
+            if (quiz) engine.checkSolution(mainNumber, note+"-"+octave);
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        sounds.stopSound(mainNumber);
+        if (playsSound) sounds.stopSound(mainNumber);
     }
 
     @Override
