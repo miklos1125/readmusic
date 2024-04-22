@@ -21,7 +21,6 @@ public class MyPanel extends JPanel{
     final int SECONDS;
     
     MyPanel(){
-        //setBackground(Color.GRAY);
         SECONDS = 60;
         URL u = this.getClass().getResource("pic/blackwood.png");
         background = Toolkit.getDefaultToolkit().createImage(u);
@@ -279,9 +278,6 @@ public class MyPanel extends JPanel{
  
         JOptionPane.showMessageDialog(frame, message,"TIME IS OVER",JOptionPane.INFORMATION_MESSAGE);
         
-        for(PianoKeys pk: keys){
-            pk.setInactive(false);
-        }
         labelA.setText("");
         labelB.setText("");
         scales.setEnabled(true);
