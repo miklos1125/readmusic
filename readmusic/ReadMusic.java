@@ -12,6 +12,7 @@ public class ReadMusic{
     static String[] notes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     static Sounds sounds;
     static GameEngine engine;
+    static Color gold, silver, veil;
     
     public static void main(String[] args) {
         frame = new JFrame("Read Music Sheets");
@@ -19,6 +20,9 @@ public class ReadMusic{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setLayout(null);
+        gold = new Color(233,206,0);
+        silver = new Color(95, 108, 140);
+        veil = new Color(255,255,255,235);
         panel = new MyPanel();
         frame.setContentPane(panel);
         frame.setVisible(true);
@@ -39,13 +43,31 @@ class GameEngine{
                    
     void selectPitch(){
         int newPitch;
+        //This part can be changed to Enums:
         String setting = panel.scales.getSelectedItem().toString();
+        String settingParts = panel.parts.getSelectedItem().toString();
         do{
             if (setting.equals("Chromatic scale")){
-                newPitch = (int)(Math.random()*49+1);
+                switch(settingParts){
+                    case "Treble": newPitch = (int)(Math.random()*28+22);
+                        break;
+                    case "Bass": newPitch = (int)(Math.random()*29+1);
+                        break;
+                    default: newPitch = (int)(Math.random()*49+1);
+                        break;
+                }
+                
             } else {
-                newPitch = standardRow[(int)(Math.random()*29)];
-                System.out.println(newPitch +" main");
+                switch(settingParts){
+                    case "Treble": newPitch = standardRow[(int)(Math.random()*17)+12];
+                        break;
+                    case "Bass": newPitch = standardRow[(int)(Math.random()*17)];
+                        break;
+                    default: newPitch = standardRow[(int)(Math.random()*29)];
+                        break;
+                }
+                
+                //System.out.println(newPitch +" main");
             
                 switch(setting){  //pitch corrections by scales
                     case "No sign. (C Major / A Minor)" : //none
@@ -82,9 +104,9 @@ class GameEngine{
             }
         } while (newPitch == pitch);
         pitch = newPitch;
-        if (pitch>27){
+        if (pitch>29 || settingParts.equals("Treble")){
             isTreble = true;
-        } else if (pitch<22){
+        } else if (pitch<22|| settingParts.equals("Bass")){
             isTreble = false;
         } else {
             isTreble = (int)(Math.random()*2) == 0;
@@ -103,7 +125,12 @@ class GameEngine{
             selectPitch();
         } else{
             panel.labelC.setForeground(Color.RED);
-            panel.labelC.setText("Try again!");
+            if((keyNumber-pitch)%12==0){
+                name = name.substring(0, name.indexOf('-'));
+                panel.labelC.setText("That's a different " + name);
+            } else {
+                panel.labelC.setText("Try again!");
+            }
             panel.labelB.setForeground(Color.RED);
             panel.labelB.setText(++counter + " / " + rightChoice);
         }
@@ -118,8 +145,9 @@ class GameEngine{
     }
     
     void reset(){
-        counter =0;
+        counter = 0;
         rightChoice = 0;
+        pitch = 0;
     }
     
     

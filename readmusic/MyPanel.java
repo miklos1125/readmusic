@@ -11,11 +11,11 @@ public class MyPanel extends JPanel{
     PianoKeys[] keys = new PianoKeys[49];
     PianoKeys[] ivory = new PianoKeys[29];
     PianoKeys[] ebony = new PianoKeys[20];
-    boolean notesOnKeys, notesOnScore, midC;
+    boolean notesOnKeys, notesOnScore, midC, isBassOff, isTrebleOff;
     SheetMusic sheet;
     JLabel labelA, labelB, labelC;
     JComboBox scales, parts;
-    Image background, logo;
+    Image background, logo; //, bluescreen;
     JButton notesOnKeyboard, notesOnStaveLines, showMiddleC, startButton, soundsButton;
     MyTimer timer;
     final int SECONDS;
@@ -25,8 +25,10 @@ public class MyPanel extends JPanel{
         SECONDS = 60;
         URL u = this.getClass().getResource("pic/blackwood.png");
         background = Toolkit.getDefaultToolkit().createImage(u);
-        URL u2 = this.getClass().getResource("pic/bosendorfer.png");
-        logo = Toolkit.getDefaultToolkit().createImage(u2);
+        u = this.getClass().getResource("pic/lynxandsiux.png");
+        logo = Toolkit.getDefaultToolkit().createImage(u);
+        //u = this.getClass().getResource("pic/bluescreen.png");
+        //bluescreen = Toolkit.getDefaultToolkit().createImage(u);
         setLayout(null);
         setDoubleBuffered(true);
         setKeyboard();
@@ -43,13 +45,15 @@ public class MyPanel extends JPanel{
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
         g2.drawImage(logo, 720, 30, 240, 50, this);
+        //g2.drawImage(bluescreen, 730, 100, 220, 160, this);
         g2.setColor(Color.WHITE);
         g2.fillRoundRect(300, 20, 400, 300, 25, 25);
         g2.translate(300,300);
         sheet.drawLines(g2);
-        if(notesOnScore) sheet.drawNoteLetters(g2);
         if(midC) sheet.drawMiddleC(g2);
-        g2.translate(-300,-300);   
+        if(notesOnScore) sheet.drawNoteLetters(g2);
+        if(isTrebleOff||isBassOff)sheet.drawVeil(g2, isTrebleOff, isBassOff);
+        g2.translate(-300,-300);
     }
     
     private void setKeyboard(){
@@ -74,7 +78,7 @@ public class MyPanel extends JPanel{
         }
         
         JLayeredPane lp = frame.getLayeredPane();
-        
+       
         int modifier = 0;
         for (PianoKeys pk: ebony){
             pk.setBounds(pk.getPlace()*33+38+modifier, 350, 19, 100);  
@@ -82,8 +86,7 @@ public class MyPanel extends JPanel{
             if (pk.getNote().equals("D#") || pk.getNote().equals("A#")){
                 modifier += 33;
             }
-        }
-        
+        }               
         for (PianoKeys pk: ivory){
             pk.setBounds(pk.getPlace()*33+15, 350, 33, 150);
             lp.add(pk, new Integer(1));
@@ -103,6 +106,31 @@ public class MyPanel extends JPanel{
         String[] s2 = {"Grand Staff", "Treble", "Bass"};
         parts = new JComboBox(s2);
         parts.setBounds(200,40,90,30);
+        parts.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent ie){
+                String selection = parts.getSelectedItem().toString();
+                if (selection.equals("Treble")){
+                    isBassOff = true; 
+                    isTrebleOff = false;
+                } else if (selection.equals("Bass")){
+                    isBassOff = false; 
+                    isTrebleOff = true;
+                } else{
+                     isBassOff = false; 
+                    isTrebleOff = false;
+                }
+                for (int i = 0; i<=20; i++){
+                    keys[i].setInactive(isBassOff ? true: false);
+                    
+                }
+                for (int i = 29; i<=48; i++){
+                    keys[i].setInactive(isTrebleOff ? true: false);
+                }
+                repaint();
+            }    
+            });
+        
         this.add(parts);
     }
     
@@ -117,6 +145,14 @@ public class MyPanel extends JPanel{
                     pk.turnTextOnOff();
                 }
                 notesOnKeys =!notesOnKeys;
+                if (notesOnKeys){
+                    notesOnKeyboard.setBackground(Color.BLACK);
+                    notesOnKeyboard.setForeground(Color.WHITE);
+                } else{
+                    notesOnKeyboard.setBackground(null);
+                    notesOnKeyboard.setForeground(null);
+                }
+                repaint();
             }
         });
         this.add(notesOnKeyboard);
@@ -131,6 +167,13 @@ public class MyPanel extends JPanel{
                     notesOnScore = !notesOnScore;
                     repaint();
                 }
+                if (notesOnScore){
+                    notesOnStaveLines.setBackground(silver);
+                    notesOnStaveLines.setForeground(gold);
+                } else{
+                    notesOnStaveLines.setBackground(null);
+                    notesOnStaveLines.setForeground(null);
+                }
             }
         });
         this.add(notesOnStaveLines);
@@ -141,16 +184,12 @@ public class MyPanel extends JPanel{
         showMiddleC.setFocusable(false);
         showMiddleC.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ae){
-                for (PianoKeys pk : keys){
-                    midC = !midC;
-                    if (keys[24].getBackground().equals(Color.WHITE)){
-                        keys[24].setBackground(Color.RED);
-                    } else {
-                        keys[24].setBackground(Color.WHITE);
-                    }
-                    
-                    repaint();
-                }
+                midC = !midC;
+                keys[24].setBackground(midC ? Color.RED : Color.WHITE); 
+                                                //Number 24 is middle C
+                showMiddleC.setText((midC ? "Hide" :"Show") + " middle C");
+                showMiddleC.setBackground(midC ? Color.RED : null);
+                repaint();
             }
         });
         this.add(showMiddleC);
@@ -161,6 +200,7 @@ public class MyPanel extends JPanel{
         startButton.setFocusable(false);
         startButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ae){
+                panel.labelC.setForeground(Color.WHITE);
                 panel.labelC.setText("Hit the corresponding key!");
                 engine.selectPitch();
                 timer = new MyTimer(labelA, SECONDS, (MyPanel)(startButton.getParent()));
@@ -177,8 +217,7 @@ public class MyPanel extends JPanel{
         });
         this.add(startButton);
         
-        soundsButton = new JButton("Sounds on");
-        Color gold = new Color(233,206,0);
+        soundsButton = new JButton("turn Sounds ON");
         soundsButton.setBounds(80, 280, 120, 30);
         soundsButton.setMargin(new Insets(0,0,0,0));
         soundsButton.setFocusable(false);
@@ -188,8 +227,8 @@ public class MyPanel extends JPanel{
                 for(PianoKeys pk: keys){
                     pk.turnSoundOnOff();
                 }
-                boolean ison = soundsButton.getText().contains("off");
-                soundsButton.setText("Sounds " +(ison ? "on" : "off"));
+                boolean ison = soundsButton.getText().contains("OFF");
+                soundsButton.setText("turn Sounds " +(ison ? "ON" : "OFF"));
                 soundsButton.setBackground((ison ? (gold) : null));
             }
         });
@@ -222,20 +261,27 @@ public class MyPanel extends JPanel{
         timer = null;
         sheet.noteHead.erasePosition();
         labelC.setText("");
+        for(PianoKeys pk: keys){
+            pk.stopSounds();
+        }
         repaint();
         for(PianoKeys pk: keys){
             pk.quiz = false;
         }
-        String message ="You collected: " + engine.getRightChoices() 
+        String message ="You have collected: " + engine.getRightChoices() 
                 + (engine.getRightChoices() > 1 ? " points" : " point") +"\n" 
                 + "out of " + engine.getCounterNum() + " attempts,\n"
                 + (notesOnKeys||notesOnScore||midC ? "with the help of:\n":
                             "and haven't used any help.")
-                +(notesOnKeys ? "notes on the keyboard;\n":"")
-                +(notesOnScore ? "notes on the stavelines;\n ":"")
-                +(midC ? "showing middle C;":"");
+                +(notesOnKeys ? "- notes on the keyboard;\n":"")
+                +(notesOnScore ? "- notes on the stavelines;\n":"")
+                +(midC ? "- showing middle C;":"");
+ 
+        JOptionPane.showMessageDialog(frame, message,"TIME IS OVER",JOptionPane.INFORMATION_MESSAGE);
         
-        JOptionPane.showMessageDialog(this, message,"TIME IS OVER",JOptionPane.INFORMATION_MESSAGE);
+        for(PianoKeys pk: keys){
+            pk.setInactive(false);
+        }
         labelA.setText("");
         labelB.setText("");
         scales.setEnabled(true);

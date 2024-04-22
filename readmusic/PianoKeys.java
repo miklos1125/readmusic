@@ -13,6 +13,8 @@ public class PianoKeys extends JButton implements MouseListener{
     private int mainNumber;
     boolean quiz = false;
     private boolean playsSound;
+    private Color myColor;
+    private boolean textOn;
     
     void setPlace(int x){
         place = x;
@@ -27,7 +29,8 @@ public class PianoKeys extends JButton implements MouseListener{
     }
     
     void turnTextOnOff(){
-        if (this.getText().equals("")){
+        textOn = !textOn;
+        if (textOn && this.isEnabled()){
             setText(note);
         }else{
             setText("");
@@ -47,12 +50,14 @@ public class PianoKeys extends JButton implements MouseListener{
         setVerticalAlignment(SwingConstants.BOTTOM);
         setMargin(new Insets(0,0,0,0));
         if (note.endsWith("#")){
-            setBackground(Color.BLACK);
+            myColor = Color.BLACK;
+            setBackground(myColor);
             setForeground(Color.WHITE);
             setBorder(null);
             setFont(new Font("Serif", Font.PLAIN, 11));
-        } else{  
-            setBackground(Color.WHITE);
+        } else{ 
+            myColor = Color.WHITE;
+            setBackground(myColor);
             setForeground(Color.BLACK);
             setFont(new Font(Font.SERIF, Font.PLAIN, 20));
         }
@@ -95,6 +100,23 @@ public class PianoKeys extends JButton implements MouseListener{
     }
     @Override
     public void mouseClicked(MouseEvent e) {
+    }
+    
+    void setInactive(boolean inactive){
+        if(inactive){
+            this.setEnabled(false);
+            this.stopSounds();
+            this.setBackground(new Color(myColor.getRed(), myColor.getGreen(), myColor.getBlue(), 235));
+            this.setText("");
+        } else{
+            this.setEnabled(true);
+            this.setBackground(myColor);
+            if(textOn) this.setText(note);
+        }
+    }
+    
+    void stopSounds(){
+        if (playsSound) sounds.stopSound(mainNumber);
     }
 }
 

@@ -54,9 +54,9 @@ public class SheetMusic {
         char[] letters4 = {'C', 'E', 'G', 'B', 'D', 'F', 'A', 'C', 'E'};
         g2.setFont(new Font("Serif", Font.BOLD, unit));
         for(int i = 0; i<letters1.length; i++){
-            g2.setColor(Color.BLUE);
+            g2.setColor(ReadMusic.gold);
             g2.drawString(String.valueOf(letters1[i]), 340, -137-i*unit);
-            g2.setColor(Color.GREEN);
+            g2.setColor(ReadMusic.silver);
             g2.drawString(String.valueOf(letters3[i]), 360, -2-i*unit);
         }
         
@@ -64,17 +64,30 @@ public class SheetMusic {
         g2.fillRect(357, -18*unit, 17, 10*unit);
         g2.fillRect(337, -9*unit, 17, 10*unit);
         for(int i = 0; i<letters2.length; i++){
-
-            g2.setColor(Color.BLUE);
+            g2.setColor(ReadMusic.gold);
             g2.drawString(String.valueOf(letters2[i]), 360, -130-i*unit);
-            g2.setColor(Color.GREEN);
+            g2.setColor(ReadMusic.silver);
             g2.drawString(String.valueOf(letters4[i]), 340, 6-i*15);
         }
     }
     
     void drawMiddleC(Graphics2D g2){
         g2.setColor(Color.RED);
-        g2.drawLine(20, -10*unit, 380, -10*unit);
-        g2.drawLine(20, -7*unit, 380, -7*unit);
+        for (int i = 25; i<=360; i+=30){
+            g2.drawLine(i, -10*unit, i+20, -10*unit);
+            g2.drawLine(i, -7*unit, i+20, -7*unit);
+        }
+        //g2.drawLine(160, -10*unit, 260, -10*unit);
+        //g2.drawLine(160, -7*unit, 260, -7*unit);
+    }
+    
+    void drawVeil(Graphics2D g2, boolean isTrebleVeil, boolean isBassVeil){
+        g2.setColor(ReadMusic.veil);
+        if(isTrebleVeil){
+            g2.fillRect(0, -18*unit, 400, (int)(9.5*unit));
+        }
+        if(isBassVeil){
+            g2.fillRect(0, (int)(-8.5*unit), 400, 9*unit);
+        }
     }
 }
