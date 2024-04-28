@@ -1,9 +1,16 @@
 package readmusic;
 
-import static readmusic.ReadMusic.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import static readmusic.ReadMusic.engine;
+import static readmusic.ReadMusic.gold;
+import static readmusic.ReadMusic.silver;
+import static readmusic.ReadMusic.sounds;
 
 public class PianoKeys extends JButton implements MouseListener{
     
@@ -11,10 +18,18 @@ public class PianoKeys extends JButton implements MouseListener{
     private String note;
     private int place;
     private int mainNumber;
-    boolean quiz = false;
+    private boolean quiz = false;
     private boolean playsSound;
     private Color myColor;
     private boolean textOn;
+    
+    public boolean isQuiz() {
+        return quiz;
+    }
+
+    public void setQuiz(boolean quiz) {
+        this.quiz = quiz;
+    }
     
     void setPlace(int x){
         place = x;
@@ -28,12 +43,16 @@ public class PianoKeys extends JButton implements MouseListener{
         return note;
     }
     
-    void turnTextOnOff(){
+    void turnTextOnOff(boolean spacingSwitch){
         textOn = !textOn;
         if (textOn && this.isEnabled()){
             setText(note);
+            if (spacingSwitch){
+                this.setForeground(octave <= 3 ? silver: gold);
+            }
         }else{
             setText("");
+            if (spacingSwitch) setForeground(Color.BLACK);
         }
     }
     
@@ -63,18 +82,6 @@ public class PianoKeys extends JButton implements MouseListener{
         }
         setText("");
         addMouseListener(this);
-        
-        //setOpaque(true);
-        //this.setVerticalTextPosition(SwingConstants.BOTTOM);
-        //setText(String.valueOf(x)); setRolloverEnabled (false);
-        
-        //this.setEnabled(false);
-        
-        //this.setFocusPainted(false);
-        //this.setFocusable(false);
-
-        //this.setBorderPainted(false);
-        //this.setContentAreaFilled(false);
     }
 
     @Override
@@ -92,6 +99,25 @@ public class PianoKeys extends JButton implements MouseListener{
         if (playsSound) sounds.stopSound(mainNumber);
     }
 
+    void setInactive(boolean inactive){
+        boolean notGF = !this.getBackground().equals(silver) && !this.getBackground().equals(gold);
+        if(inactive){
+            this.setEnabled(false);
+            this.stopSounds();
+            if(notGF)this.setBackground(new Color(195, 195, 195, 235));
+            this.setText("");
+        } else{
+            this.setEnabled(true);
+            if(notGF)this.setBackground(myColor);
+            if(textOn) this.setText(note);
+        }
+    }
+    
+    void stopSounds(){
+        if (playsSound) sounds.stopSound(mainNumber);
+    }
+    
+    //Out of service
     @Override
     public void mouseEntered(MouseEvent e) {
     }
@@ -100,23 +126,6 @@ public class PianoKeys extends JButton implements MouseListener{
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-    }
-    
-    void setInactive(boolean inactive){
-        if(inactive){
-            this.setEnabled(false);
-            this.stopSounds();
-            this.setBackground(new Color(myColor.getRed(), myColor.getGreen(), myColor.getBlue(), 235));
-            this.setText("");
-        } else{
-            this.setEnabled(true);
-            this.setBackground(myColor);
-            if(textOn) this.setText(note);
-        }
-    }
-    
-    void stopSounds(){
-        if (playsSound) sounds.stopSound(mainNumber);
     }
 }
 

@@ -3,15 +3,14 @@ package readmusic;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class MyTimer extends TimerTask {
     private int seconds;
-    JLabel myLabel;
-    Timer timer;
-    MyPanel panel;
+    private JLabel myLabel;
+    private Timer timer;
+    private ControlPanel panel;
     
-    MyTimer(JLabel label, int seconds, MyPanel panel){
+    MyTimer(JLabel label, int seconds, ControlPanel panel){
         timer = new Timer();
         this.seconds = seconds;
         this.myLabel = label;
@@ -27,6 +26,10 @@ public class MyTimer extends TimerTask {
             panel.endSetting();
         }
         seconds--;
+    }
+    
+    void stop(){
+        timer.cancel();
     }
     
 }

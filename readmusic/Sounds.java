@@ -4,8 +4,8 @@ import javax.sound.midi.*;
 
 public class Sounds {
     
-    Synthesizer synth;
-    MidiChannel[] midiCh;
+    private Synthesizer synth;
+    private MidiChannel[] midiCh;
     
     public Sounds(){
         try{
