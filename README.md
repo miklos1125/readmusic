@@ -8,6 +8,7 @@ You can find source code inside readmusic folder.
 
 With different helping options:
 
-![readmusic1](https://github.com/miklos1125/readmusic/assets/127934692/defc43dd-0849-463e-8134-ab573d6bc6d7)
+![image](https://github.com/miklos1125/readmusic/assets/127934692/3f8b8a6a-7a20-48da-a307-5e0c1c231b04)
+
 
 
