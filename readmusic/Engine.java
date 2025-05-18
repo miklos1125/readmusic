@@ -211,7 +211,7 @@ public class Engine{
     void checkSolution(int keyNumber, String name){
         if (keyNumber == pitch){
             panel.labelC.setForeground(Color.WHITE);
-            panel.labelC.setText("Hit the corresponding key!");
+            panel.labelC.setText("Press the indicated key!");
             panel.labelB.setForeground(Color.WHITE);
             panel.labelB.setText(++counter + "  /  " + ++rightChoice);
             selectPitch();
@@ -219,7 +219,7 @@ public class Engine{
             panel.labelC.setForeground(Color.RED);
             if((keyNumber-pitch)%12==0){
                 name = name.substring(0, name.indexOf('-'));
-                panel.labelC.setText("That's a different " + name);
+                panel.labelC.setText("Same note, different octave.");//("That's a different " + name);
             } else {
                 panel.labelC.setText("Try again!");
             }
@@ -241,8 +241,6 @@ public class Engine{
         rightChoice = 0;
         pitch = 0;
         accidental = Accidental.NONE;
-    }
-    
-    
+    }  
 }
 

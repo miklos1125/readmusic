@@ -11,7 +11,7 @@ public class NoteHead {
     private int position;
     private boolean showAccidental, showCourtesyBrackets;
     private Accidental myAccidental;
-    static final private int unit = 15;
+    static final private int UNIT = 15;
     
     static Image notehead;
     static Image sharp; 
@@ -73,53 +73,53 @@ public class NoteHead {
         if(showAccidental || showCourtesyBrackets){
             if (myAccidental.equals(Accidental.SHARP)){
                 if(showCourtesyBrackets) drawCourtresyBrackets(g2);
-                g2.drawImage(sharp, 178, -position*unit/2-10, 20, 20, ReadMusic.panel);
+                g2.drawImage(sharp, 178, -position*UNIT/2-10, 20, 20, ReadMusic.panel);
             } else if (myAccidental.equals(Accidental.FLAT)){
                 if(showCourtesyBrackets) drawCourtresyBrackets(g2);
-                g2.drawImage(flat, 178, -position*unit/2-15, 20, 24, ReadMusic.panel);
+                g2.drawImage(flat, 178, -position*UNIT/2-15, 20, 24, ReadMusic.panel);
             }
         }
         //extra lines
         switch(position){
             case 0:
-                g2.drawLine(200,0*unit-1,223,0*unit-1);
-                g2.drawLine(200,0*unit,223,0*unit);
+                g2.drawLine(200,0*UNIT-1,223,0*UNIT-1);
+                g2.drawLine(200,0*UNIT,223,0*UNIT);
             case 1:
             case 2:
-                g2.drawLine(200,-1*unit-1,223,-1*unit-1);
-                g2.drawLine(200,-1*unit,223,-1*unit);
+                g2.drawLine(200,-1*UNIT-1,223,-1*UNIT-1);
+                g2.drawLine(200,-1*UNIT,223,-1*UNIT);
                 break;
             case 16:
-                g2.drawLine(200,-8*unit-1,223,-8*unit-1);
-                g2.drawLine(200,-8*unit,223,-8*unit);
+                g2.drawLine(200,-8*UNIT-1,223,-8*UNIT-1);
+                g2.drawLine(200,-8*UNIT,223,-8*UNIT);
             case 14:
             case 15:
-                g2.drawLine(200,-7*unit-1,223,-7*unit-1);
-                g2.drawLine(200,-7*unit,223,-7*unit);
+                g2.drawLine(200,-7*UNIT-1,223,-7*UNIT-1);
+                g2.drawLine(200,-7*UNIT,223,-7*UNIT);
                 break;
             case 18:
-                g2.drawLine(200,-9*unit-1,223,-9*unit-1);
-                g2.drawLine(200,-9*unit,223,-9*unit);
+                g2.drawLine(200,-9*UNIT-1,223,-9*UNIT-1);
+                g2.drawLine(200,-9*UNIT,223,-9*UNIT);
             case 19:
             case 20:
-                g2.drawLine(200,-10*unit-1,223,-10*unit-1);
-                g2.drawLine(200,-10*unit,223,-10*unit);
+                g2.drawLine(200,-10*UNIT-1,223,-10*UNIT-1);
+                g2.drawLine(200,-10*UNIT,223,-10*UNIT);
                 break;
             case 34:
-                g2.drawLine(200,-17*unit-1,223,-17*unit-1);
-                g2.drawLine(200,-17*unit,223,-17*unit);
+                g2.drawLine(200,-17*UNIT-1,223,-17*UNIT-1);
+                g2.drawLine(200,-17*UNIT,223,-17*UNIT);
             case 32:
             case 33:
-                g2.drawLine(200,-16*unit-1,223,-16*unit-1);
-                g2.drawLine(200,-16*unit,223,-16*unit);
+                g2.drawLine(200,-16*UNIT-1,223,-16*UNIT-1);
+                g2.drawLine(200,-16*UNIT,223,-16*UNIT);
                 break;
         }
-        g2.drawImage(notehead, 200, -position*unit/2-12, 24, 24, ReadMusic.panel);
+        g2.drawImage(notehead, 200, -position*UNIT/2-12, 24, 24, ReadMusic.panel);
     }
     
     void drawCourtresyBrackets(Graphics2D g2){
         g2.setFont(mediumFont);
-        g2.drawString("(", 173, -position*unit/2+6);
-        g2.drawString(")", 196, -position*unit/2+6);
+        g2.drawString("(", 173, -position*UNIT/2+6);
+        g2.drawString(")", 196, -position*UNIT/2+6);
     }
 }

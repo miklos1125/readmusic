@@ -10,12 +10,20 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.net.URL;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingConstants;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 import readmusic.ReadMusic.ScaleUsed;
 import static readmusic.ReadMusic.engine;
 import static readmusic.ReadMusic.frame;
@@ -38,6 +46,8 @@ public class ControlPanel extends JPanel{
     Image background, logo, icon, sign, blackscreen;
     JButton notesOnKeyboard, notesOnStaveLines, showMiddleC, showGandF, showSpacings,
             startButton, courtesyAccidentals, soundsButton;
+    JRadioButtonMenuItem [] midiKeyboards;
+    MidiConnection midiCon;
     MyTimer timer;
     private int seconds;
     
@@ -59,6 +69,7 @@ public class ControlPanel extends JPanel{
         setKeyboard();
         setSettings();
         setButtons();
+        setMenu();
         setLabels();
         sheet = SheetMusic.getSheetMusic();
     }
@@ -70,19 +81,19 @@ public class ControlPanel extends JPanel{
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         //controll board graphics:
         g2.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
-        g2.drawImage(logo, 720, 20, 240, 50, this);
-        g2.drawImage(sign, 865, 230, 90, 80, this);
-        g2.drawImage(blackscreen, 710, 80, 260, 130, this);
+        g2.drawImage(logo, 780, 20, 240, 50, this);
+        g2.drawImage(sign, 925, 230, 90, 80, this);
+        g2.drawImage(blackscreen, 770, 80, 260, 130, this);
         //sheet music graphics:
         g2.setColor(Color.WHITE);
-        g2.fillRoundRect(300, 20, 400, 300, 25, 25);
-        g2.translate(300,300);
+        g2.fillRoundRect(360, 20, 400, 300, 25, 25);
+        g2.translate(360,300);
         sheet.drawLines(g2);
         if(isMid_C_On) sheet.drawMiddleC(g2);
         if(isGandF_On) sheet.drawGF(g2);
         if(areNotesOnScore || areSpacingShown) sheet.drawNoteLetters(g2, areSpacingShown);
         if(isTrebleOff||isBassOff)sheet.drawVeil(g2, isTrebleOff, isBassOff);
-        g2.translate(-300,-300);
+        g2.translate(-360,-300);
     }
     
     private void setKeyboard(){
@@ -108,16 +119,17 @@ public class ControlPanel extends JPanel{
         
         JLayeredPane lp = frame.getLayeredPane();
        
-        int modifier = 0;
+        int ebonyModifier = 68;
+        int ivoryModifier = 45;
         for (PianoKeys pk: ebony){
-            pk.setBounds(pk.getPlace()*33+38+modifier, 350, 19, 100);  
+            pk.setBounds(pk.getPlace()*33+ebonyModifier, 370, 19, 100);  
             lp.add(pk, new Integer(2));
             if (pk.getNote().equals("D#") || pk.getNote().equals("A#")){
-                modifier += 33;
+                ebonyModifier += 33;
             }
         }               
         for (PianoKeys pk: ivory){
-            pk.setBounds(pk.getPlace()*33+15, 350, 33, 150);
+            pk.setBounds(pk.getPlace()*33+ivoryModifier, 370, 33, 150);
             lp.add(pk, new Integer(1));
         }
     }
@@ -134,7 +146,7 @@ public class ControlPanel extends JPanel{
             "7b (C-flat Major/A-flat minor)"};
         scalesSetter = new JComboBox(s1);
         scalesSetter.setFont(new Font("Serif", Font.PLAIN, 12));
-        scalesSetter.setBounds(15,40,175,30);
+        scalesSetter.setBounds(30,40,175,30);
         scalesSetter.addItemListener(new ItemListener(){
             @Override
             public void itemStateChanged(ItemEvent ie){
@@ -184,14 +196,17 @@ public class ControlPanel extends JPanel{
                 }
                 engine.setScaleUsed(su);
                 sheet.setAccidentals(su);
+                for (PianoKeys pk : keys){
+                    pk.refresh();
+                }
                 repaint();
             }    
-            });
+        });
         this.add(scalesSetter);
         
         String[] s2 = {"Grand Staff", "Treble", "Bass"};
         parts_Setter = new JComboBox(s2);
-        parts_Setter.setBounds(200,40,90,30);
+        parts_Setter.setBounds(230,40,90,30);
         parts_Setter.addItemListener(new ItemListener(){
             @Override
             public void itemStateChanged(ItemEvent ie){
@@ -210,21 +225,21 @@ public class ControlPanel extends JPanel{
                     engine.setPartOfSheet(ReadMusic.PartOfSheet.GRAND);
                 }
                 for (int i = 0; i<=20; i++){
-                    keys[i].setInactive(isBassOff ? true: false);
+                    keys[i].setInactive(isBassOff ? true: false, isGandF_On);
                     
                 }
                 for (int i = 29; i<=48; i++){
-                    keys[i].setInactive(isTrebleOff ? true: false);
+                    keys[i].setInactive(isTrebleOff ? true: false, isGandF_On);
                 }
                 repaint();
-            }    
-            });
+            }
+        });
         
         this.add(parts_Setter);
         
         String[] s3 = {"1 minute test time", "2 minutes test time", "half minute test time"};
         minutes_Setter = new JComboBox(s3);
-        minutes_Setter.setBounds(160,280,130,30);
+        minutes_Setter.setBounds(190,280,130,30);
         minutes_Setter.addItemListener(new ItemListener(){
             @Override
             public void itemStateChanged(ItemEvent ie){
@@ -246,7 +261,7 @@ public class ControlPanel extends JPanel{
     
     private void setButtons(){
         notesOnKeyboard = new JButton("Notes on keyboard");
-        notesOnKeyboard.setBounds(15, 100, 130, 30);
+        notesOnKeyboard.setBounds(30, 100, 130, 30);
         notesOnKeyboard.setMargin(new Insets(0,0,0,0));
         notesOnKeyboard.setFocusable(false);
         notesOnKeyboard.addActionListener(new ActionListener(){
@@ -269,7 +284,7 @@ public class ControlPanel extends JPanel{
         this.add(notesOnKeyboard);
         
         notesOnStaveLines = new JButton("Notes on stavelines");
-        notesOnStaveLines.setBounds(15, 160, 130, 30);
+        notesOnStaveLines.setBounds(30, 160, 130, 30);
         notesOnStaveLines.setMargin(new Insets(0,0,0,0));
         notesOnStaveLines.setFocusable(false);
         notesOnStaveLines.addActionListener(new ActionListener(){
@@ -291,7 +306,7 @@ public class ControlPanel extends JPanel{
         this.add(notesOnStaveLines);
         
         showSpacings = new JButton("Show \"ACEG FACE\"");
-        showSpacings.setBounds(15, 220, 130, 30);
+        showSpacings.setBounds(30, 220, 130, 30);
         showSpacings.setMargin(new Insets(0,0,0,0));
         showSpacings.setFocusable(false);
         showSpacings.addActionListener(new ActionListener(){
@@ -312,7 +327,7 @@ public class ControlPanel extends JPanel{
         this.add(showSpacings);
         
         courtesyAccidentals = new JButton("Courtesy accidentals");
-        courtesyAccidentals.setBounds(160, 100, 130, 30);
+        courtesyAccidentals.setBounds(190, 100, 130, 30);
         courtesyAccidentals.setMargin(new Insets(0,0,0,0));
         //courtesyAccidentals.setBackground(Color.WHITE);
         courtesyAccidentals.setForeground(Color.BLACK);
@@ -331,7 +346,7 @@ public class ControlPanel extends JPanel{
         this.add(courtesyAccidentals);
                 
         showMiddleC = new JButton("Show middle C");
-        showMiddleC.setBounds(160, 160, 130, 30);
+        showMiddleC.setBounds(190, 160, 130, 30);
         showMiddleC.setMargin(new Insets(0,0,0,0));
         showMiddleC.setFocusable(false);
         showMiddleC.addActionListener(new ActionListener(){
@@ -347,16 +362,20 @@ public class ControlPanel extends JPanel{
         this.add(showMiddleC);
         
         showGandF = new JButton("Show G and F");
-        showGandF.setBounds(160, 220, 130, 30);
+        showGandF.setBounds(190, 220, 130, 30);
         showGandF.setMargin(new Insets(0,0,0,0));
         showGandF.setFocusable(false);
         showGandF.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ae){
                 isGandF_On = ! isGandF_On;
-                keys[17].setBackground(isGandF_On ? silver : Color.WHITE); 
+                if(!isBassOff){
+                    keys[17].setBackground(isGandF_On ? silver : Color.WHITE); 
                                                 //Number 17 is F
+                }
+                if(!isTrebleOff){
                 keys[31].setBackground(isGandF_On ? gold : Color.WHITE); 
                                                 //Number 31 is G
+                }
                 showGandF.setText((isGandF_On ? "Hide" :"Show") + " G and F");
                 showGandF.setBackground(isGandF_On ? gold : null);
                 showGandF.setForeground(isGandF_On ? silver : null);
@@ -366,7 +385,7 @@ public class ControlPanel extends JPanel{
         this.add(showGandF);
         
         startButton = new JButton("Start");
-        startButton.setBounds(745, 230, 80, 80);
+        startButton.setBounds(805, 230, 80, 80);
         startButton.setMargin(new Insets(0,0,0,0));
         startButton.setFocusable(false);
         startButton.addActionListener(new ActionListener(){
@@ -387,7 +406,7 @@ public class ControlPanel extends JPanel{
         this.add(startButton);
         
         soundsButton = new JButton("turn Sounds ON");
-        soundsButton.setBounds(15, 280, 130, 30);
+        soundsButton.setBounds(30, 280, 130, 30);
         soundsButton.setMargin(new Insets(0,0,0,0));
         soundsButton.setFocusable(false);
         soundsButton.setBackground(gold);
@@ -404,19 +423,89 @@ public class ControlPanel extends JPanel{
         this.add(soundsButton);
     }
     
+    private void setMenu(){
+        JMenuBar menuBar = new JMenuBar();
+        
+        /*JMenu about = new JMenu("About");
+        JMenuItem aboutItem = new JMenuItem("About");
+        about.add(aboutItem);
+        menuBar.add(about);*/
+        
+        JMenu midiMenu = new JMenu("MIDI list");
+        midiMenu.addMenuListener(new MenuListener(){
+            @Override
+            public void menuSelected(MenuEvent e) {;
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+                //Unused.
+            }
+            @Override
+            public void menuCanceled(MenuEvent e) {
+                //Unused.
+            }
+        });
+        midiCon = new MidiConnection();
+        String[] keyboardList = midiCon.getAvailableDevices();
+        midiKeyboards = new JRadioButtonMenuItem[keyboardList.length];
+        ButtonGroup buttonGroup = new ButtonGroup();
+        for(int i = 0; i < midiKeyboards.length; i++){
+            midiKeyboards[i] = new JRadioButtonMenuItem(keyboardList[i]);
+            final int deviceNum = i;
+            midiKeyboards[i].addItemListener(new ItemListener(){
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if(e.getStateChange() == ItemEvent.SELECTED){
+                        midiCon.stopConnection(false);
+                        midiCon.startConnection(deviceNum);
+                    }
+                }
+            });
+            buttonGroup.add(midiKeyboards[i]);
+            midiMenu.add(midiKeyboards[i]);
+        }
+        midiMenu.addSeparator();
+        JMenuItem midiOff = new JMenuItem("MIDI off");
+        midiOff.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                midiCon.stopConnection(false);
+                buttonGroup.clearSelection();
+            }
+        });
+        midiMenu.add(midiOff);
+        JMenuItem refresh = new JMenuItem("Refresh list");
+        refresh.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                midiMenu.setVisible(false);
+                midiCon.stopConnection(true);
+                setMenu();
+                //midiMenu.revalidate();
+                //midiMenu.repaint();
+            }
+        });
+        midiMenu.add(refresh);
+        menuBar.add(midiMenu);
+      
+        frame.setJMenuBar(menuBar);
+    }
+    
+    
     private void setLabels(){
         labelA = new JLabel("",SwingConstants.CENTER);
         labelA.setFont(standardFont);
-        labelA.setBounds(730, 90, 220, 30);
+        labelA.setBounds(790, 90, 220, 30);
         labelA.setForeground(Color.WHITE);
         labelA.setOpaque(false);
         labelB = new JLabel("",SwingConstants.CENTER);
         labelB.setFont(bigFont);
-        labelB.setBounds(730, 130, 220, 30);
+        labelB.setBounds(790, 130, 220, 30);
         labelB.setOpaque(false);
         labelC = new JLabel("",SwingConstants.CENTER);
         labelC.setFont(standardFont);
-        labelC.setBounds(730, 165, 220, 30);
+        labelC.setBounds(790, 165, 220, 30);
         labelC.setForeground(Color.WHITE);
         labelC.setOpaque(false);
         this.add(labelA);
@@ -426,7 +515,7 @@ public class ControlPanel extends JPanel{
     
     void startSettings(){
         labelC.setForeground(Color.WHITE);
-        labelC.setText("Hit the corresponding key!");
+        labelC.setText("Press the indicated key!");
         engine.selectPitch();
         timer = new MyTimer(labelA, seconds, (ControlPanel)(startButton.getParent()));
         startButton.setText("Quit");
@@ -439,6 +528,9 @@ public class ControlPanel extends JPanel{
         scalesSetter.setEnabled(false);
         parts_Setter.setEnabled(false);
         minutes_Setter.setEnabled(false);
+        for(JRadioButtonMenuItem item: midiKeyboards){
+            item.setEnabled(false);
+        }
         for(PianoKeys pk: keys){
             pk.setQuiz(true);
         }
@@ -458,6 +550,7 @@ public class ControlPanel extends JPanel{
             pk.setQuiz(false);
         }
         startButton.setText("OK");
+        startButton.setBackground(Color.RED);
     }
     
     void endSetting(){
@@ -495,6 +588,7 @@ public class ControlPanel extends JPanel{
         labelC.setText(message2);
         //JOptionPane.showMessageDialog(frame, message,"TIME IS OVER",JOptionPane.INFORMATION_MESSAGE);
         startButton.setText("OK");
+        startButton.setBackground(Color.RED);
     }
     
     void cleanUp(){
@@ -512,7 +606,11 @@ public class ControlPanel extends JPanel{
         showGandF.setEnabled(true);
         if(scalesSetter.getSelectedIndex() > 1)courtesyAccidentals.setEnabled(true);
         startButton.setText("Start");
+        startButton.setBackground(null);
         engine.reset();
-    }   
+        for(JRadioButtonMenuItem item: midiKeyboards){
+            item.setEnabled(true);
+        }
+    }
 }
 

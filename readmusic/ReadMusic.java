@@ -12,7 +12,9 @@ public class ReadMusic{
     enum Accidental{NONE, SHARP, FLAT, NATURAL};
     static JFrame frame;
     static ControlPanel panel;
-    static String[] notes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    static String[][] notes = {{"C", "B#"},{"C#", "Db"}, {"D", ""}, {"D#", "Eb"}, 
+                                {"E", "Fb"}, {"F", "E#"}, {"F#", "Gb"}, {"G", ""}, 
+                                {"G#", "Ab"}, {"A", ""}, {"A#", "Bb"}, {"B", "Cb"}};
     static Sounds sounds;
     static Engine engine;
     static Color gold, silver, veil;
@@ -20,7 +22,7 @@ public class ReadMusic{
     
     public static void main(String[] args) {
         frame = new JFrame("Lynxandsioux - Learn how to read sheet music!");
-        frame.setBounds(100, 100, 1000, 550);
+        frame.setBounds(100, 100, 1060, 570);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setLayout(null);

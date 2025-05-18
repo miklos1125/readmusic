@@ -2,7 +2,7 @@ package readmusic;
 
 import javax.sound.midi.*;
 
-public class Sounds {
+public class Sounds{
     
     private Synthesizer synth;
     private MidiChannel[] midiCh;
