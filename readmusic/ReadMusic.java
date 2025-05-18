@@ -21,7 +21,7 @@ public class ReadMusic{
     static Font bigFont, standardFont, mediumFont;
     
     public static void main(String[] args) {
-        frame = new JFrame("Lynxandsioux - Learn how to read sheet music!");
+        frame = new JFrame("Music Reader");
         frame.setBounds(100, 100, 1060, 570);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
