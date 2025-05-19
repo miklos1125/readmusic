@@ -1,5 +1,5 @@
 # readmusic
-Music Reader is a desktop application to learn and practice sheet music reading. 
+Music Reader is a desktop application for learning and practicing music reading.
 Choose a scale and press start to test your skills. 
 You can use several helping options to find the name of a musical note or to find the correct key on the keyboard.
 Mouse with graphical piano keys and MIDI-keyboards are both available.
