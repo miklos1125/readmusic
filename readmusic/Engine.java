@@ -6,6 +6,11 @@ import readmusic.ReadMusic.ScaleUsed;
 import readmusic.ReadMusic.Accidental;
 import static readmusic.ReadMusic.panel;
 
+/**
+ * Engine singleton class: the core of the test flow.
+ * Selects a random note from the chosen scale, sends it to the GUI for display,
+ * validates user answers, and tracks correct and incorrect responses.
+ */
 public class Engine{
     private ScaleUsed scaleUsed;
     private PartOfSheet partOfSheet;
@@ -16,7 +21,17 @@ public class Engine{
     private int counter, rightChoice;
     private int[] standardRow = {1,3,5,6,8,10,12,13,15,17,18,20,22,24,25,27,
                     29,30,32,34,36,37,39,41,42,44,46,48,49};
-    Engine(){
+    private static Engine instance;
+    
+    public static Engine getEngine(){
+        if (instance == null){
+            instance = new Engine();
+        }
+        return instance;
+    }
+    
+    
+    private Engine(){
         scaleUsed = ScaleUsed.NONE;
         partOfSheet = PartOfSheet.GRAND;
         accidental = Accidental.NONE;
@@ -58,7 +73,7 @@ public class Engine{
     void selectPitch(){
         int newPitch;
         isHalfNote = false; // A halfNote can be presented by a black key, a BCEF change can't,
-        isBCEF = false;  // So this is to avoid white key to white key changing problems
+        isBCEF = false;  // This prevents issues when transitioning between white keys.
         do{
             if (scaleUsed.equals(ScaleUsed.CHROMATIC)){
                 switch(partOfSheet){
@@ -84,8 +99,9 @@ public class Engine{
                     default: newPitch = standardRow[(int)(Math.random()*29)]; //same as GRAND
                         break;
                 }
-
-                switch(scaleUsed){  //pitch corrections by scalesSetter
+                
+                //pitch corrections by scalesSetter 
+                switch(scaleUsed){  
                     case NONE : isHalfNote = false;
                         break;
                     case SHARP7 :
@@ -208,7 +224,7 @@ public class Engine{
         panel.repaint();
     }
 
-    void checkSolution(int keyNumber, String name){
+    void checkResponses(int keyNumber, String name){
         if (keyNumber == pitch){
             panel.labelC.setForeground(Color.WHITE);
             panel.labelC.setText("Press the indicated key!");

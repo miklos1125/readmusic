@@ -4,6 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JFrame;
 
+/**
+ * Main class of the ReadMusic application.
+ * For launching the application and starting the main window (with panel).
+ * It also contains main static objects accessible throughout the program
+ * and some enums and colections representing music theory concepts used in the application.
+ */
 public class ReadMusic{
     
     enum ScaleUsed{NONE, CHROMATIC, SHARP1, SHARP2, SHARP3, SHARP4, SHARP5, SHARP6, SHARP7,
@@ -12,6 +18,8 @@ public class ReadMusic{
     enum Accidental{NONE, SHARP, FLAT, NATURAL};
     static JFrame frame;
     static ControlPanel panel;
+    
+   // Two-dimensional array for the names of the keys and their alternative names:
     static String[][] notes = {{"C", "B#"},{"C#", "Db"}, {"D", ""}, {"D#", "Eb"}, 
                                 {"E", "Fb"}, {"F", "E#"}, {"F#", "Gb"}, {"G", ""}, 
                                 {"G#", "Ab"}, {"A", ""}, {"A#", "Bb"}, {"B", "Cb"}};
@@ -20,6 +28,7 @@ public class ReadMusic{
     static Color gold, silver, veil;
     static Font bigFont, standardFont, mediumFont;
     
+    // Entry point of the application. Starts the GUI and sets up main parts of the program.
     public static void main(String[] args) {
         frame = new JFrame("Music Reader");
         frame.setBounds(100, 100, 1060, 570);
@@ -32,12 +41,12 @@ public class ReadMusic{
         bigFont = new Font(Font.DIALOG, Font.BOLD, 24);
         mediumFont = new Font(Font.DIALOG, Font.PLAIN, 21);
         standardFont = new Font(Font.DIALOG, Font.BOLD, 16);
-        panel = new ControlPanel();
+        panel = ControlPanel.getControlPanel();
         frame.setContentPane(panel);
         frame.setVisible(true);
-        sounds = new Sounds();
-        engine = new Engine();
-     }     
+        sounds = Sounds.getSounds();
+        engine = Engine.getEngine();
+    }     
 }
 
 

@@ -33,6 +33,11 @@ import static readmusic.ReadMusic.silver;
 import static readmusic.ReadMusic.bigFont;
 import static readmusic.ReadMusic.standardFont;
 
+/**
+ * GUI control panel for the ReadMusic application. -  A singleton class.
+ * Handles user interface components such as buttons and dropdowns,
+ * and connects user actions to the main application logic.
+ */
 public class ControlPanel extends JPanel{
     
     PianoKeys[] keys = new PianoKeys[49];
@@ -42,7 +47,7 @@ public class ControlPanel extends JPanel{
             isBassOff, isTrebleOff, areCourtesyAccidentalsOn;
     SheetMusic sheet;
     JLabel labelA, labelB, labelC;
-    JComboBox scalesSetter, parts_Setter, minutes_Setter;
+    JComboBox<String> scalesSetter, parts_Setter, minutes_Setter;
     Image background, logo, icon, sign, blackscreen;
     JButton notesOnKeyboard, notesOnStaveLines, showMiddleC, showGandF, showSpacings,
             startButton, courtesyAccidentals, soundsButton;
@@ -50,8 +55,16 @@ public class ControlPanel extends JPanel{
     MidiConnection midiCon;
     MyTimer timer;
     private int seconds;
+    static private ControlPanel instance;
     
-    ControlPanel(){
+    public static ControlPanel getControlPanel(){
+        if (instance == null){
+            instance = new ControlPanel();
+        }
+        return instance;
+    }
+    
+    private ControlPanel(){
         seconds = 60;
         URL u = this.getClass().getResource("pic/blackwood.png");
         background = Toolkit.getDefaultToolkit().createImage(u);
@@ -74,6 +87,9 @@ public class ControlPanel extends JPanel{
         sheet = SheetMusic.getSheetMusic();
     }
     
+    /**
+    * Draws the background elements and the sheet music.
+    */
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -96,6 +112,9 @@ public class ControlPanel extends JPanel{
         g2.translate(-360,-300);
     }
     
+    /**
+    * Separates white and black keys and places them in the correct positions.
+    */
     private void setKeyboard(){
         int i = 0, note = i, octave = 2;
         for (; i < keys.length; i++){
@@ -116,7 +135,7 @@ public class ControlPanel extends JPanel{
                 ivory[counterW++] = pk;
             }
         }
-        
+        //allows components to overlap each other:
         JLayeredPane lp = frame.getLayeredPane();
        
         int ebonyModifier = 68;
@@ -124,6 +143,8 @@ public class ControlPanel extends JPanel{
         for (PianoKeys pk: ebony){
             pk.setBounds(pk.getPlace()*33+ebonyModifier, 370, 19, 100);  
             lp.add(pk, new Integer(2));
+            
+        // Gaps in the black key layout after D# and A#:
             if (pk.getNote().equals("D#") || pk.getNote().equals("A#")){
                 ebonyModifier += 33;
             }
@@ -134,7 +155,12 @@ public class ControlPanel extends JPanel{
         }
     }
     
+    /**
+    * Sets up the dropdown lists used in the GUI.
+    */
     private void setSettings(){
+         
+    // scalesSetter for selecting a musical scale:   
         String[] s1 = {"No sign. (C Major / A minor)",
             "Chromatic scale", "1# (G Major / E minor)",
             "2# (D Major / B minor)", "3# (A Major/F-sharp minor)",
@@ -144,7 +170,7 @@ public class ControlPanel extends JPanel{
             "3b (E-flat Major/C minor)", "4b (A-flat Major/F minor)",
             "5b (D-flat Major/B-flat minor)", "6b (G-flat Major/E-flat minor)", 
             "7b (C-flat Major/A-flat minor)"};
-        scalesSetter = new JComboBox(s1);
+        scalesSetter = new JComboBox<>(s1);
         scalesSetter.setFont(new Font("Serif", Font.PLAIN, 12));
         scalesSetter.setBounds(30,40,175,30);
         scalesSetter.addItemListener(new ItemListener(){
@@ -204,8 +230,9 @@ public class ControlPanel extends JPanel{
         });
         this.add(scalesSetter);
         
+        //parts_Setter for selecting clefs: Treble, Bass, or both (Grand Staff).
         String[] s2 = {"Grand Staff", "Treble", "Bass"};
-        parts_Setter = new JComboBox(s2);
+        parts_Setter = new JComboBox<>(s2);
         parts_Setter.setBounds(230,40,90,30);
         parts_Setter.addItemListener(new ItemListener(){
             @Override
@@ -234,11 +261,11 @@ public class ControlPanel extends JPanel{
                 repaint();
             }
         });
-        
         this.add(parts_Setter);
         
+        //minutes_Setter for selecting test duration.
         String[] s3 = {"1 minute test time", "2 minutes test time", "half minute test time"};
-        minutes_Setter = new JComboBox(s3);
+        minutes_Setter = new JComboBox<>(s3);
         minutes_Setter.setBounds(190,280,130,30);
         minutes_Setter.addItemListener(new ItemListener(){
             @Override
@@ -259,6 +286,7 @@ public class ControlPanel extends JPanel{
         this.add(minutes_Setter);
     }
     
+    // Sets up the buttons, which mainly operate as on/off switches.
     private void setButtons(){
         notesOnKeyboard = new JButton("Notes on keyboard");
         notesOnKeyboard.setBounds(30, 100, 130, 30);
@@ -384,6 +412,8 @@ public class ControlPanel extends JPanel{
         });
         this.add(showGandF);
         
+        // Three-position switch button representing three states: 
+        // default, running, and displaying results or interrupt messages.
         startButton = new JButton("Start");
         startButton.setBounds(805, 230, 80, 80);
         startButton.setMargin(new Insets(0,0,0,0));
@@ -398,9 +428,7 @@ public class ControlPanel extends JPanel{
                         break;
                     case "OK" : cleanUp();
                         break;
-                }
-                
-                
+                }   
             }
         });
         this.add(startButton);
@@ -423,6 +451,7 @@ public class ControlPanel extends JPanel{
         this.add(soundsButton);
     }
     
+    // Sets up menu(s).
     private void setMenu(){
         JMenuBar menuBar = new JMenuBar();
         
@@ -431,6 +460,7 @@ public class ControlPanel extends JPanel{
         about.add(aboutItem);
         menuBar.add(about);*/
         
+        //For detecting and connecting midi keyboards
         JMenu midiMenu = new JMenu("MIDI list");
         midiMenu.addMenuListener(new MenuListener(){
             @Override
@@ -492,7 +522,7 @@ public class ControlPanel extends JPanel{
         frame.setJMenuBar(menuBar);
     }
     
-    
+    //Sets up labels.
     private void setLabels(){
         labelA = new JLabel("",SwingConstants.CENTER);
         labelA.setFont(standardFont);
@@ -513,6 +543,11 @@ public class ControlPanel extends JPanel{
         this.add(labelC);
     }
     
+    //SETTINGS FOR FOUR WORKING STATES:
+    
+    /**
+    * Settings for the test flow.
+    */
     void startSettings(){
         labelC.setForeground(Color.WHITE);
         labelC.setText("Press the indicated key!");
@@ -536,6 +571,9 @@ public class ControlPanel extends JPanel{
         }
     }
     
+    /**
+    * Settings for an interruption. (After Quit button.)
+    */
     void quitSettings(){
         timer.stop();
         timer = null;
@@ -553,6 +591,9 @@ public class ControlPanel extends JPanel{
         startButton.setBackground(Color.RED);
     }
     
+    /**
+    * Settings for ending the test and displaying the results.
+    */
     void endSetting(){
         timer = null;
         sheet.noteHead.erasePosition();
@@ -591,6 +632,9 @@ public class ControlPanel extends JPanel{
         startButton.setBackground(Color.RED);
     }
     
+    /**
+    * Settings for resetting the application after OK button press.
+    */
     void cleanUp(){
         labelA.setText("");
         labelB.setFont(bigFont);

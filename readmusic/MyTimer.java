@@ -4,6 +4,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JLabel;
 
+/**
+ * Manages a timer to track test duration and handle test completion.
+ */
 public class MyTimer extends TimerTask {
     private int seconds;
     private JLabel myLabel;

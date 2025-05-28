@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.sound.midi.*;
 import javax.sound.midi.MidiDevice.Info;
-import javax.swing.Action;
 import static readmusic.ReadMusic.panel;
 
+/**
+ * Class for listing and connecting available MIDI instruments.
+ * Handles detection and selection of MIDI devices.
+ */
 public class MidiConnection {
     
     ArrayList<Info> info;
@@ -17,6 +20,7 @@ public class MidiConnection {
     public MidiConnection(){
         info = new ArrayList<>(Arrays.asList(MidiSystem.getMidiDeviceInfo()));
         
+        // A logic to keep only the usable devices:
         for(int i = info.size()-1; i >= 0; i--){
             
             try{
@@ -100,20 +104,22 @@ public class MidiConnection {
                 if (message instanceof ShortMessage) {
                     ShortMessage sm = (ShortMessage) message;
                     int note = sm.getData1();
-                    if (note >= 36 && note <= 84){
-                        if(sm.getData2()>0){
+                    // 36 is the offset between MIDI keycodes and the program's internal keycodes.
+                    // The app handles keycodes in the range 36 (C2) to 84 (C6).
+                    if (note >= 36 && note <= 84){  
+                        // 0 is for silence/stop playing sound:
+                        if(sm.getData2()>0){   
                             panel.keys[note-36].presser();
                         } else{
                             panel.keys[note-36].releaser();
                         }
-                        //Billentyűk aktiválása 'note' alapján.
-                        /*System.out.println((sm.getData2()>0?"Lenyomott" :"Felengedett" ) + " billentyű: "+ note 
-                            + "\n\t hangerő: " + sm.getData2() 
+                        //Activating keys by "note".
+                        //Experimenting legacy code kept here...
+                        /*System.out.println((sm.getData2()>0?"pushed" :"released" ) + " key: "+ note 
+                            + "\n\t volume: " + sm.getData2() 
                             + "\n\t MIDI Channel: " +sm.getChannel()
-                            + "\n\t Parancs: "+ sm.getCommand());*/
-                        
+                            + "\n\t command: "+ sm.getCommand());*/   
                     }
-
                 }
             }
             @Override

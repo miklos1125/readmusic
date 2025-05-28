@@ -6,7 +6,11 @@ import readmusic.ReadMusic.Accidental;
 import readmusic.ReadMusic.PartOfSheet;
 import static readmusic.ReadMusic.mediumFont;
 
-public class NoteHead {
+/**
+* A class for positioning and drawing the notehead on the score,
+* and adding the corresponding accidentals if needed.
+*/
+public class NoteHead{
     
     private int position;
     private boolean showAccidental, showCourtesyBrackets;
@@ -18,7 +22,7 @@ public class NoteHead {
     static Image flat;
     
     NoteHead(){
-        position = -1;
+        position = -1; //no notehead on the sheet.
         showAccidental = false;
       
         URL u = this.getClass().getResource("pic/notehead.png"); 
@@ -42,9 +46,16 @@ public class NoteHead {
         showCourtesyBrackets = !showCourtesyBrackets;
     }
     
-    void setPosition(int pitch, PartOfSheet whereToShow, Accidental accidental, boolean isBCEF){
-        int selector;
-        switch(accidental){
+    void setPosition(int pitch, PartOfSheet whereToShow, Accidental accidental, boolean isBCEF){ 
+    // The selector, selects a position on (or between) the lines of the music sheet. 
+    // It is used as an index, it starts at 0, while pitch numbers start at 1.
+    // Therefore, the selector is usually pitch-1 by default.
+    // Flats are always displayed one position higher (with a b sign). So selector = pitch.
+    // For sharps, B# has the same pitch as C, and E# has the same pitch as F,
+    // so they are shown one position lower on the staff (with a # sign).
+    // That's why these (when isBCEF = true) require an extra subtraction: pitch - 2
+       int selector;
+       switch(accidental){
             case FLAT : selector = pitch;
                 break;
             case SHARP : selector = isBCEF ? pitch-2: pitch-1;
@@ -67,9 +78,15 @@ public class NoteHead {
     
     boolean isAvailable(){
         return position >= 0;
+        //if -1 there is no notehead on the sheet.
     }
     
     void draw(Graphics2D g2){
+        // The caller method (SheetMusic.drawLines) 
+        //checks isAvailable before calling,
+        //The next line is for safety:
+        if (position < 0) return; 
+        
         if(showAccidental || showCourtesyBrackets){
             if (myAccidental.equals(Accidental.SHARP)){
                 if(showCourtesyBrackets) drawCourtresyBrackets(g2);
@@ -79,7 +96,7 @@ public class NoteHead {
                 g2.drawImage(flat, 178, -position*UNIT/2-15, 20, 24, ReadMusic.panel);
             }
         }
-        //extra lines
+        //extra lines (ledger lines)
         switch(position){
             case 0:
                 g2.drawLine(200,0*UNIT-1,223,0*UNIT-1);

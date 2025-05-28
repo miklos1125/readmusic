@@ -3,19 +3,20 @@ package readmusic;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.LineBorder;
+
 import static readmusic.ReadMusic.engine;
 import static readmusic.ReadMusic.gold;
 import static readmusic.ReadMusic.silver;
 import static readmusic.ReadMusic.sounds;
 
+/**
+ * Class for managing piano keys as interactive buttons.
+ */
 public class PianoKeys extends JButton implements MouseListener{
     
     private int octave;
@@ -27,6 +28,43 @@ public class PianoKeys extends JButton implements MouseListener{
     private Color myColor;
     private boolean textOn;
     private boolean spacing;
+    
+    PianoKeys(String[] note, int octave, int num){
+        this.mainNumber = num;
+        this.note = note[0];
+        this.alias = note[1];
+        this.octave = octave;
+        setRolloverEnabled(false);
+        setFocusable(false);
+        setVerticalAlignment(SwingConstants.BOTTOM);
+        setMargin(new Insets(0,0,0,0));
+        if (note[0].endsWith("#")){
+            myColor = Color.BLACK;
+            setBackground(myColor);
+            setForeground(Color.WHITE);
+            setBorder(null);
+            setFont(new Font("Serif", Font.PLAIN, 11));
+        } else{ 
+            myColor = Color.WHITE;
+            setBackground(myColor);
+            setForeground(Color.BLACK);
+            setFont(new Font(Font.SERIF, Font.PLAIN, 20));
+        }
+        setText("");
+        addMouseListener(this);
+    }
+    
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if(e.getButton() == 1) {
+            presser();
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        releaser();
+    }
     
     public boolean isQuiz() {
         return quiz;
@@ -48,6 +86,11 @@ public class PianoKeys extends JButton implements MouseListener{
         return note;
     }
     
+    /**
+    * Toggles the note name for a key.
+    * Handles enharmonic equivalents (e.g., C# vs. Db) using two parallel arrays
+    * for primary note names and their aliases.
+    */
     void turnTextOnOff(boolean spacingSwitch){
         textOn = !textOn;
         if (textOn && this.isEnabled()){
@@ -168,53 +211,17 @@ public class PianoKeys extends JButton implements MouseListener{
         playsSound = !(playsSound);
     }
     
-    PianoKeys(String[] note, int octave, int num){
-        this.mainNumber = num;
-        this.note = note[0];
-        this.alias = note[1];
-        this.octave = octave;
-        setRolloverEnabled(false);
-        setFocusable(false);
-        setVerticalAlignment(SwingConstants.BOTTOM);
-        setMargin(new Insets(0,0,0,0));
-        if (note[0].endsWith("#")){
-            myColor = Color.BLACK;
-            setBackground(myColor);
-            setForeground(Color.WHITE);
-            setBorder(null);
-            setFont(new Font("Serif", Font.PLAIN, 11));
-        } else{ 
-            myColor = Color.WHITE;
-            setBackground(myColor);
-            setForeground(Color.BLACK);
-            setFont(new Font(Font.SERIF, Font.PLAIN, 20));
-        }
-        setText("");
-        addMouseListener(this);
-    }
-    
-    
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if(e.getButton() == 1) {
-            presser();
-        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        releaser();
-    }
-    
+    //both for mouse and MIDI-keyboard
     void presser(){
         if(this.isEnabled()){
             getModel().setArmed(true);
             getModel().setPressed(true);
             if (playsSound) sounds.playSound(mainNumber);
-            if (quiz) engine.checkSolution(mainNumber, note+"-"+octave);
+            if (quiz) engine.checkResponses(mainNumber, note+"-"+octave);
         }
     }
     
+    //both for mouse and MIDI-keyboard
     void releaser(){
         if (this.isEnabled()){
             getModel().setArmed(false);

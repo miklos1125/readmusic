@@ -6,13 +6,15 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.net.URL;
 import readmusic.ReadMusic.ScaleUsed;
 import static readmusic.ReadMusic.gold;
 import static readmusic.ReadMusic.silver;
 
+/**
+ * Singleton class used to handle sheet music visuals.
+ */
 public class SheetMusic {
     
     private Image treble; 
@@ -39,10 +41,16 @@ public class SheetMusic {
         bass = Toolkit.getDefaultToolkit().createImage(u);
     }
     
+    /**
+    * Sets the selected scale.
+    */
     public void setAccidentals(ScaleUsed scale){
         this.scale = scale;
     }
     
+    /**
+     * Draws the staff lines, clefs, and a notehead.
+     */
     void drawLines(Graphics2D g2){
         g2.setColor(Color.BLACK);
         for(int i = -2*UNIT; i >= -6*UNIT; i-=UNIT){
@@ -63,11 +71,16 @@ public class SheetMusic {
         drawAccidentals(g2);
     }
     
+    /**
+     * Draws the key signature corresponding to the selected scale.
+     */
     void drawAccidentals(Graphics2D g2){
-        int CALIB_VERTICAL = 3;
-        int UNIT_VERTICAL = 10;
-        int START_VERTICAL = UNIT*4+CALIB_VERTICAL;
-        int SIZE = 22;
+        final int CALIB_VERTICAL = 3;
+        final int UNIT_VERTICAL = 10;
+        final int START_VERTICAL = UNIT*4+CALIB_VERTICAL;
+        final int SIZE = 22;
+        
+        // fallthrough is used because higher numbers of key signature accidentals include all accidentals shown by lower numbers.
         switch (scale){
             case NONE : noteHead.setAccidental(false);
                 break;
@@ -93,6 +106,7 @@ public class SheetMusic {
                 //fall through
             case SHARP1 :   g2.drawImage(noteHead.sharp, START_VERTICAL, -16*UNIT+4, SIZE, SIZE, ReadMusic.panel);
                             g2.drawImage(noteHead.sharp, START_VERTICAL, -6*UNIT+4, SIZE, SIZE, ReadMusic.panel);
+                            // The notehead can use own accidental if none is assigned here, or if the user selected a courtesy accidental:
                             noteHead.setAccidental(false);
                 break;
             case FLAT7 :    g2.drawImage(noteHead.flat, START_VERTICAL+6*UNIT_VERTICAL, -12*UNIT-7, SIZE, SIZE, ReadMusic.panel);
@@ -115,11 +129,15 @@ public class SheetMusic {
                 //fall through
             case FLAT1 :    g2.drawImage(noteHead.flat, START_VERTICAL, -14*UNIT, SIZE, SIZE, ReadMusic.panel);
                             g2.drawImage(noteHead.flat, START_VERTICAL, -4*UNIT, SIZE, SIZE, ReadMusic.panel);
+                            // The notehead can use its own accidental if none is assigned here, or if the user selected a courtesy accidental:
                             noteHead.setAccidental(false);
                 break;
         }
     }
     
+    /**
+    * Draws note names as a visual help.
+    */
     void drawNoteLetters(Graphics g2, boolean spacingsOn){
         char[] letters1 = {'B', 'D', 'F', 'A', 'C', 'E', 'G', 'B'};
         char[] letters2 = {'A', 'C', 'E', 'G', 'B', 'D', 'F', 'A', 'C',};
@@ -153,6 +171,9 @@ public class SheetMusic {
         }
     }
     
+    /**
+    * Draws red ledger lines to mark middle C in both treble and bass clefs.
+    */
     void drawMiddleC(Graphics2D g2){
         g2.setColor(Color.RED);
         for (int i = 25; i<=360; i+=30){
@@ -163,6 +184,9 @@ public class SheetMusic {
         //g2.drawLine(160, -7*UNIT, 260, -7*UNIT);
     }
     
+    /**
+    * Draws a "veil" overlay on inactive parts of the sheet.
+    */
     void drawVeil(Graphics2D g2, boolean isTrebleVeil, boolean isBassVeil){
         g2.setColor(ReadMusic.veil);
         if(isTrebleVeil){
@@ -172,7 +196,10 @@ public class SheetMusic {
             g2.fillRect(0, (int)(-8.5*UNIT), 400, 9*UNIT);
         }
     }
-
+    
+    /**
+    * Draws colored G and F lines as a visual help.
+    */
     void drawGF(Graphics2D g2) {
         g2.setColor(gold);
         g2.setStroke(new BasicStroke(2f));

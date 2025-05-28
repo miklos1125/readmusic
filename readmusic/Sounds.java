@@ -2,12 +2,23 @@ package readmusic;
 
 import javax.sound.midi.*;
 
+/**
+ * A singleton class. Uses MIDI synthesizer class to play piano sounds.
+ */
 public class Sounds{
     
     private Synthesizer synth;
     private MidiChannel[] midiCh;
+    static private Sounds instance;
     
-    public Sounds(){
+    public static Sounds getSounds(){
+        if (instance == null){
+            instance = new Sounds();
+        }
+        return instance;
+    }
+    
+    private Sounds(){
         try{
             synth = MidiSystem.getSynthesizer();
             synth.open();
